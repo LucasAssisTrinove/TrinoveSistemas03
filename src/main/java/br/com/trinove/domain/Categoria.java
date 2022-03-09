@@ -80,10 +80,5 @@ public class Categoria implements Serializable {
 	}
 
 
-	
-	
-	
-	
-	
 
 }
