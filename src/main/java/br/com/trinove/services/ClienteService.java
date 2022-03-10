@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import br.com.trinove.domain.Cidade;
 import br.com.trinove.domain.Cliente;
 import br.com.trinove.domain.Endereco;
+import br.com.trinove.domain.enums.Perfil;
 import br.com.trinove.domain.enums.TipoCliente;
 //import br.com.trinove.domain.Cliente;
 import br.com.trinove.dto.ClienteDTO;
@@ -21,6 +22,8 @@ import br.com.trinove.dto.ClienteNewDTO;
 import br.com.trinove.repositories.CidadeRepository;
 import br.com.trinove.repositories.ClienteRepository;
 import br.com.trinove.repositories.EnderecoRepository;
+import br.com.trinove.security.UserSS;
+import br.com.trinove.services.exception.AuthorizationException;
 import br.com.trinove.services.exception.DateIntegrityException;
 import br.com.trinove.services.exception.ObjectNotFoundException;
 
@@ -40,9 +43,20 @@ public class ClienteService {
 	@Autowired
 	private EnderecoRepository enderecoRepository;
 	
+	
+	
+	
 
 	
 	public Cliente find(Integer id) {
+		
+		UserSS user = UserService.authenticated();
+		
+		if(user==null || !user.hasRole(Perfil.ADMIN) && !id.equals(user.getID())) {
+			throw new AuthorizationException("Acesso negado");
+		}
+		
+		
 		Optional<Cliente> obj = repo.findById(id);
 		return obj.orElseThrow(() -> new ObjectNotFoundException(
 		"Objeto não encontrado! Id: " + id + ", Tipo: " + Cliente.class.getName()));
