@@ -6,8 +6,12 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import br.com.trinove.domain.Cliente;
 import br.com.trinove.domain.ItemPedido;
 import br.com.trinove.domain.PagamentoComBoleto;
 import br.com.trinove.domain.Pedido;
@@ -16,6 +20,8 @@ import br.com.trinove.repositories.ItemPedidoRepository;
 import br.com.trinove.repositories.PagamentoRepository;
 import br.com.trinove.repositories.PedidoRepository;
 import br.com.trinove.repositories.ProdutoRepository;
+import br.com.trinove.security.UserSS;
+import br.com.trinove.services.exception.AuthorizationException;
 import br.com.trinove.services.exception.ObjectNotFoundException;
 
 
@@ -39,6 +45,9 @@ public class PedidoService {
 	
 	@Autowired
 	private ItemPedidoRepository itemPedidoRepository;
+	
+	@Autowired
+	private ClienteService clienteservice;
 	
 	
 	
@@ -68,6 +77,18 @@ public class PedidoService {
 		}
 		itemPedidoRepository.saveAll(obj.getItens());
 		return obj;
+	}
+	
+	public Page<Pedido> findPage(Integer page, Integer linesPerPage, String orderBy, String direction){
+		
+		UserSS user = UserService.authenticated();
+		if(user == null) {
+			throw new AuthorizationException("Acesso negado");
+		}		
+		PageRequest pageRequest =  PageRequest.of(page, linesPerPage, Direction.valueOf(direction),orderBy);
+		Cliente clinete =  clienteservice.find(user.getID());
+		return repo.findByCliente(clinete, pageRequest);
+		
 	}
 
 }
