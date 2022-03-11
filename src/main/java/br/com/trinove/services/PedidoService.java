@@ -16,6 +16,7 @@ import br.com.trinove.domain.ItemPedido;
 import br.com.trinove.domain.PagamentoComBoleto;
 import br.com.trinove.domain.Pedido;
 import br.com.trinove.domain.enums.EstadoPagamento;
+import br.com.trinove.repositories.ClienteRepository;
 import br.com.trinove.repositories.ItemPedidoRepository;
 import br.com.trinove.repositories.PagamentoRepository;
 import br.com.trinove.repositories.PedidoRepository;
@@ -49,6 +50,9 @@ public class PedidoService {
 	@Autowired
 	private ClienteService clienteservice;
 	
+	@Autowired
+	private ClienteRepository clienteRepository;
+	
 	
 	
 	public Pedido find(Integer id) {
@@ -57,10 +61,11 @@ public class PedidoService {
 		"Objeto não encontrado! Id: " + id + ", Tipo: " + Pedido.class.getName()));
 		}
 	
-	@Transactional
+	//@Transactional
 	public Pedido insert(Pedido obj) {
 		obj.setId(null);
 		obj.setInstate(new Date());
+		obj.setCliente(clienteservice.find(obj.getCliente().getId()));
 		obj.getPagamento().setEstado(EstadoPagamento.PENDENTE);
 		obj.getPagamento().setPedido(obj);
 		if(obj.getPagamento() instanceof PagamentoComBoleto) {
@@ -72,10 +77,12 @@ public class PedidoService {
 		
 		for (ItemPedido ip : obj.getItens()) {
 			ip.setDesconto(0.0);
-			ip.setPreco(produtoService.find(ip.getProduto().getId()).getPreco());
+			ip.setProduto(produtoService.find(ip.getProduto().getId()));
+			ip.setPreco(ip.getProduto().getPreco());
 			ip.setPedido(obj);
 		}
 		itemPedidoRepository.saveAll(obj.getItens());
+		System.out.println(obj);
 		return obj;
 	}
 	
