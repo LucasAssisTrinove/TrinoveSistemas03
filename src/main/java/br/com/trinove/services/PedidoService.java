@@ -3,6 +3,8 @@ package br.com.trinove.services;
 import java.util.Date;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -62,7 +64,7 @@ public class PedidoService {
 		"Objeto não encontrado! Id: " + id + ", Tipo: " + Pedido.class.getName()));
 		}
 	
-	//@Transactional
+	@Transactional
 	public Pedido insert(Pedido obj) {
 		obj.setId(null);
 		obj.setInstate(new Date());
