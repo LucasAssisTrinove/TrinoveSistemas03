@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import br.com.trinove.services.DBService;
+import br.com.trinove.services.Emailservice;
+import br.com.trinove.services.MockEmailService;
 
 @Configuration
 @Profile("test")
@@ -20,5 +22,10 @@ public class testConfig {
 	public boolean instantiateDataabase() throws ParseException {
 		dbService.instantiateTestDatabase();
 		return true;
+	}
+	
+	@Bean
+	public Emailservice emailService() {
+		return new MockEmailService();
 	}
 }
