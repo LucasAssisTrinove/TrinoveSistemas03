@@ -4,6 +4,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.springframework.mail.SimpleMailMessage;
 
+import br.com.trinove.domain.Cliente;
 import br.com.trinove.domain.Pedido;
 
 public interface Emailservice {
@@ -16,4 +17,5 @@ public interface Emailservice {
 	
 	void sendHtmlEmail(MimeMessage msg);
 	
+	void sendNewPasswordEmail(Cliente cliente, String newPass);
 }
