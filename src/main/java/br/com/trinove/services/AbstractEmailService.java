@@ -2,6 +2,7 @@ package br.com.trinove.services;
 
 import java.util.Date;
 
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,12 +50,17 @@ public abstract class AbstractEmailService implements Emailservice {
 	
 	@Override
     public void sendOrderConfirmationHtmlEmail(Pedido obj) {
+		try {
 		MimeMessage mm = prepareMimeMessageFromPedido(obj);
 		sendHtmlEmail(mm);
+		}
+		catch(MessagingException e) {
+			sendOrdeConfirmationEmail(obj);
+		}
 		
 	}
 
-	private MimeMessage prepareMimeMessageFromPedido(Pedido obj) {
+	private MimeMessage prepareMimeMessageFromPedido(Pedido obj) throws MessagingException {
 		MimeMessage mimeMessage = javaMaiSender.createMimeMessage();
 		MimeMessageHelper mmh = new MimeMessageHelper(mimeMessage, true);
 		mmh.setTo(obj.getCliente().getEmail());
@@ -62,7 +68,7 @@ public abstract class AbstractEmailService implements Emailservice {
 		mmh.setSubject("Pedido confirmado! C´´odigo: "+ obj.getId());
 		mmh.setSentDate(new Date(System.currentTimeMillis()));
 		mmh.setText(htmlFromTemplatePedido(obj),true);
-		return null;
+		return mimeMessage;
 	}
 
 }
